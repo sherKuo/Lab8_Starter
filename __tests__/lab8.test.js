@@ -23,15 +23,20 @@ describe('Basic user flow for Website', () => {
     let data, plainValue;
     // Query select all of the <product-item> elements
     const prodItems = await page.$$('product-item');
-    console.log(`Checking product item 1/${prodItems.length}`);
-    // Grab the .data property of <product-items> to grab all of the json data stored inside
-    data = await prodItems[0].getProperty('data');
-    // Convert that property to JSON
-    plainValue = await data.jsonValue();
-    // Make sure the title, price, and image are populated in the JSON
-    if (plainValue.title.length == 0) { allArePopulated = false; }
-    if (plainValue.price.length == 0) { allArePopulated = false; }
-    if (plainValue.image.length == 0) { allArePopulated = false; }
+
+    //step 1 put check in for loop
+    for(let i=0; i<prodItems.length; i++) {
+      console.log(`Checking product item ${i}/${prodItems.length}`);
+      // Grab the .data property of <product-items> to grab all of the json data stored inside
+      data = await prodItems[i].getProperty('data');
+      // Convert that property to JSON
+      plainValue = await data.jsonValue();
+      // Make sure the title, price, and image are populated in the JSON
+      if (plainValue.title.length == 0) { allArePopulated = false; }
+      if (plainValue.price.length == 0) { allArePopulated = false; }
+      if (plainValue.image.length == 0) { allArePopulated = false; }
+    }
+
     // Expect allArePopulated to still be true
     expect(allArePopulated).toBe(true);
 
@@ -47,9 +52,17 @@ describe('Basic user flow for Website', () => {
     console.log('Checking the "Add to Cart" button...');
     // TODO - Step 2
     // Query a <product-item> element using puppeteer ( checkout page.$() and page.$$() in the docs )
+    const selectedProd = await page.$('product-item');
     // Grab the shadowRoot of that element (it's a property), then query a button from that shadowRoot.
+    var shadowroot = selectedProd.shadowRoot;
+    var buttonSelected = shadowroot.querySelector("button");
     // Once you have the button, you can click it and check the innerText property of the button.
+    document.addEventListener("click", function(){
+      document.getElementById(buttonSelected).innerText;
+    });
     // Once you have the innerText property, use innerText['_remoteObject'].value to get the text value of it
+    expect(innerText['_remoteObject'].value).toBe("Remove From Cart");
+
   }, 2500);
 
   // Check to make sure that after clicking "Add to Cart" on every <product-item> that the Cart
@@ -58,8 +71,14 @@ describe('Basic user flow for Website', () => {
     console.log('Checking number of items in cart on screen...');
     // TODO - Step 3
     // Query select all of the <product-item> elements, then for every single product element
+    const prodItems = await page.$$('product-item');
     // get the shadowRoot and query select the button inside, and click on it.
-    // Check to see if the innerText of #cart-count is 20
+    var shadowRoot;
+    for(let i=0; i<prodItems.length; i++) {
+      shadowroot = selectedProd.shadowRoot.querySelector("button");
+
+    }
+      // Check to see if the innerText of #cart-count is 20iss
   }, 10000);
 
   // Check to make sure that after you reload the page it remembers all of the items in your cart
